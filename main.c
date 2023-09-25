@@ -6,34 +6,34 @@ coroutine_t* cor;
 
 void ts1(void* args)
 {
-    // while(1)
+    /* while(1) */
     {
-        printf("ts1111\n");
+        printf("ts1 coroutine runing...\n");
         sleep(1);
-        coroutine_yield(cor);
+        coroutine_yield(cor); /* 调度 */
     }
-    coroutine_remove(cor);
-
+    printf("ts1 finish...\n");
+    coroutine_remove(cor);    /* 协程结束后,移除对应节点 */
 }
 
 void ts2(void* args)
 {
-    // while(1)
+    while(1)
     {
-        printf("ts2222\n");
+        printf("ts2 coroutine runing...\n");
         sleep(1);
-        coroutine_yield(cor);
+        coroutine_yield(cor); /* 调度 */
     }
     coroutine_remove(cor);
 }
 
 void ts3(void* args)
 {
-    // while(1)
+    while(1)
     {
-        printf("ts3333\n");
+        printf("ts3 coroutine runing...\n");
         sleep(1);
-        coroutine_yield(cor);
+        coroutine_yield(cor); /* 调度 */
     }
     coroutine_remove(cor);
 }
@@ -41,20 +41,19 @@ void ts3(void* args)
 
 int main(void)
 {
-    cor = coroutine_create(2048);
+    cor = coroutine_create(2048);  /* 创建协程 */
     
-    coroutine_add(cor, ts1, NULL);
+    coroutine_add(cor, ts1, NULL); /* 添加协程函数 */
     coroutine_add(cor, ts2, NULL);
     coroutine_add(cor, ts3, NULL);
 
     while(1)
     {
-        printf("main func...\n");
-        coroutine_yield(cor);
+        printf("main coroutine runing...\n");
+        coroutine_yield(cor); /* 调度 */
     }
-    // coroutine_remove(cor);
-    coroutine_destory(cor);
 
-    printf("-----finish...\n");
+    coroutine_destory(cor);   /* 释放资源 */
+
     return 0;
 }
