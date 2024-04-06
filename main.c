@@ -41,7 +41,7 @@ void ts3(void* args)
 
 int main(void)
 {
-    cor = coroutine_create(2048);  /* 创建协程 */
+    cor = coroutine_create(16384);  /* 创建协程 */
     
     coroutine_add(cor, ts1, NULL); /* 添加协程函数 */
     coroutine_add(cor, ts2, NULL);

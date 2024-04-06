@@ -2,6 +2,10 @@
 #include <ucontext.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct _coroutine
 {
     ucontext_t *node;
@@ -36,13 +40,12 @@ coroutine_t* coroutine_create(int stack_size)
 
 int coroutine_add(coroutine_t* cor, void(*func)(void*), void* args)
 {
-    ucontext_t *tmp, *node;
+    ucontext_t *node=NULL;
     if(!cor || !func) return -1;
 
-    tmp = cor->head->uc_link;
     node = _new_node(func, args, cor->stack_size);
-    cor->head->uc_link = node;
-    node->uc_link = tmp;
+	node->uc_link = cor->head->uc_link;
+	cor->head->uc_link = node;
 
     return 0;
 }
@@ -83,16 +86,27 @@ void coroutine_yield(coroutine_t* cor)
 
 void coroutine_destory(coroutine_t* cor)
 {
-    ucontext_t *node = cor->head->uc_link, *tmp;
+    ucontext_t *node, *tmp;
+    
+    if(!cor) return;
+    do{
+        if(!cor->head) break;
+        node= cor->head->uc_link;
 
-    while(node != cor->head){
-        tmp = node;
-        node = node->uc_link;
+        while(node != cor->head){
+            tmp = node;
+            node = node->uc_link;
+            free(tmp->uc_stack.ss_sp);
+            free(tmp);
+        }
+        tmp = cor->head;
         free(tmp->uc_stack.ss_sp);
         free(tmp);
-    }
-    tmp = cor->head;
-    free(tmp->uc_stack.ss_sp);
-    free(tmp);
+    }while(0U);
+
     free(cor);
 }
+
+#ifdef __cplusplus
+}
+#endif
